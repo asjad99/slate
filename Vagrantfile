@@ -14,7 +14,7 @@ Vagrant.configure(2) do |config|
     SHELL
 
   # add the local user git config to the vm
-  config.vm.provision "file", source: "~/.gitconfig", destination: ".gitconfig"
+  config.vm.provision "file", source: "/Users/asjad/documents/post_demo/slate", destination: ".gitconfig"
 
   config.vm.provision "install",
     type: "shell",

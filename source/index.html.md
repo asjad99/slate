@@ -1,5 +1,5 @@
 ---
-title: API Reference
+title: Semantic Search (Beta)
 
 language_tabs: # must be one of https://git.io/vQNgJ
   - shell
@@ -9,21 +9,23 @@ language_tabs: # must be one of https://git.io/vQNgJ
 
 toc_footers:
   - <a href='#'>Sign Up for a Developer Key</a>
-  - <a href='https://github.com/tripit/slate'>Documentation Powered by Slate</a>
 
 includes:
   - errors
 
-search: true
+search: false
 ---
 
-# Introduction
+# What is Semantic Search? 
+ 
+Semantic Search as a service can process raw, unstructured digital texts (“plain text”). 
 
-Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
+At its core it uses Latent Semantic Analysis to discover semantic structure of documents by examining statistical co-occurrence patterns of the words within a corpus of training documents. LSA is unsupervised, which means no human input is necessary – you only need a corpus of plain text documents. Once these statistical patterns are found, any plain text documents can be succinctly expressed in the new, semantic representation. The representation via Index can then be queried for topical similarity against other documents. 
+
+The semantic Search service functions are available via API EndPoints.
 
 We have language bindings in Shell, Ruby, and Python! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
 
-This example API documentation page was created with [Slate](https://github.com/tripit/slate). Feel free to edit it and use it as a base for your own API's documentation.
 
 # Authentication
 
@@ -32,208 +34,154 @@ This example API documentation page was created with [Slate](https://github.com/
 ```ruby
 require 'kittn'
 
-api = Kittn::APIClient.authorize!('meowmeowmeow')
+api = Kittn::APIClient.authorize!('your_generated_key')
 ```
 
 ```python
 import kittn
 
-api = kittn.authorize('meowmeowmeow')
+api = kittn.authorize('your_generated_key')
 ```
 
 ```shell
 # With shell, you can just pass the correct header with each request
-curl "api_endpoint_here"
-  -H "Authorization: meowmeowmeow"
+curl -X POST 
+  {Server_URL}
+  -H 'cache-control: no-cache' 
+  -H 'content-type: application/json' 
+  -H 'postman-token: 339767b1-088c-6a42-e491-dce52b16e4e3' 
+  -H 'x-api-key: CowP0hsIke3SYXHdFCauR9WxwYJSzOK6dL9Fr1k5' 
+  -d '{"query": "film unit with lens", "lsi_top": 1000}'
+
 ```
 
 ```javascript
 const kittn = require('kittn');
 
-let api = kittn.authorize('meowmeowmeow');
+let api = kittn.authorize('your_generated_key');
 ```
 
-> Make sure to replace `meowmeowmeow` with your API key.
+> Make sure to replace `your_generated_key` with your API key.
 
-Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://example.com/developers).
+API keys are required to allow access to the API. You can register a new Semantic search API key at our [developer portal](http://lsi.fortheta.com/developers).
 
-Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:
+Search search API expects for the API key to be included in all API requests to the server in a header that looks like the following:
 
-`Authorization: meowmeowmeow`
+`Authorization: your_generated_key`
 
 <aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
+You must replace <code>your_generated_key</code> with your personal API key.
 </aside>
 
-# Kittens
 
-## Get All Kittens
+# Semantic Search on Wikipedia  
+
+## Fetch Semantically Similar Documents
 
 ```ruby
-require 'kittn'
 
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
+require 'uri'
+require 'net/http'
+
+url = URI("http://lsi.foretheta.com/")
+
+http = Net::HTTP.new(url.host, url.port)
+
+request = Net::HTTP::Post.new(url)
+request["content-type"] = 'application/json'
+request["x-api-key"] = 'your generated key'
+request.body = "{\n \"query\": \"a musical instrument is an instrument created or adapted to make musical sounds. in principle, any object that produces sound can be considered a musical instrumentit is through purpose that the object becomes a musical instrument. the history of musical instruments dates to the beginnings of human culture. early musical instruments may have been used for ritual, such as a trumpet to signal success on the hunt, or a drum in a religious ceremony. cultures eventually developed composition and performance of melodies for entertainment.\"\n}"
+
+response = http.request(request)
+puts response.read_body
+
 ```
 
 ```python
-import kittn
+import requests
 
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get()
+url = "http://lsi.foretheta.com/"
+
+payload = "{\n    \"query\": \"a musical instrument is an instrument created or adapted to make musical sounds. in principle, any object that produces sound can be considered a musical instrumentit is through purpose that the object becomes a musical instrument. the history of musical instruments dates to the beginnings of human culture. early musical instruments may have been used for ritual, such as a trumpet to signal success on the hunt, or a drum in a religious ceremony. cultures eventually developed composition and performance of melodies for entertainment.\"\n}"
+headers = {
+    'content-type': "application/json",
+    'x-api-key': "your_generated_key"
+    }
+
+response = requests.request("POST", url, data=payload, headers=headers)
+
+print(response.text)
 ```
 
 ```shell
-curl "http://example.com/api/kittens"
-  -H "Authorization: meowmeowmeow"
+curl -X POST \
+  http://lsi.foretheta.com/ \
+  -H 'content-type: application/json' \
+  -H 'x-api-key: your generated key' \
+  -d '{
+    "query": "a musical instrument is an instrument created or adapted to make musical sounds. in principle, any object that produces sound can be considered a musical instrumentit is through purpose that the object becomes a musical instrument. the history of musical instruments dates to the beginnings of human culture. early musical instruments may have been used for ritual, such as a trumpet to signal success on the hunt, or a drum in a religious ceremony. cultures eventually developed composition and performance of melodies for entertainment."
+}'
 ```
 
 ```javascript
-const kittn = require('kittn');
 
-let api = kittn.authorize('meowmeowmeow');
-let kittens = api.kittens.get();
+var settings = {
+  "async": true,
+  "crossDomain": true,
+  "url": "http://lsi.foretheta.com/",
+  "method": "POST",
+  "headers": {
+    "content-type": "application/json",
+    "x-api-key": "your generated key"
+  },
+  "processData": false,
+  "data": "{\n    \"query\": \"a musical instrument is an instrument created or adapted to make musical sounds. in principle, any object that produces sound can be considered a musical instrumentit is through purpose that the object becomes a musical instrument. the history of musical instruments dates to the beginnings of human culture. early musical instruments may have been used for ritual, such as a trumpet to signal success on the hunt, or a drum in a religious ceremony. cultures eventually developed composition and performance of melodies for entertainment.\"\n}"
+}
+
+$.ajax(settings).done(function (response) {
+  console.log(response);
+});
+
 ```
 
 > The above command returns JSON structured like this:
 
 ```json
 [
-  {
-    "id": 1,
-    "name": "Fluffums",
-    "breed": "calico",
-    "fluffiness": 6,
-    "cuteness": 7
-  },
-  {
-    "id": 2,
-    "name": "Max",
-    "breed": "unknown",
-    "fluffiness": 5,
-    "cuteness": 10
-  }
+    {
+        "url": [
+            "https://en.wikipedia.org/wiki?curid=37001823"
+        ],
+        "score": 0.66654103994369507,
+        "title": [
+            "list of astronomical instruments"
+        ]
+    },
+    {
+        "url": [
+            "https://en.wikipedia.org/wiki?curid=209519"
+        ],
+        "score": 0.71585583686828613,
+        "title": [
+            "bandoneon"
+        ]
+    }
 ]
 ```
 
-This endpoint retrieves all kittens.
+Description: This endpoint retrieves all Documents that are semantically similar to the given query 
 
 ### HTTP Request
 
-`GET http://example.com/api/kittens`
+`GET http://lsi.foretheta.com/api/search`
 
 ### Query Parameters
 
 Parameter | Default | Description
 --------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
+Query | "" | The Query String.
+Top_N | 1000 | Return the top N most relevent documents.
 
 <aside class="success">
-Remember — a happy kitten is an authenticated kitten!
+Remember — you will receive a 200 upon succeful authentication!
 </aside>
-
-## Get a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.get(2);
-```
-
-> The above command returns JSON structured like this:
-
-```json
-{
-  "id": 2,
-  "name": "Max",
-  "breed": "unknown",
-  "fluffiness": 5,
-  "cuteness": 10
-}
-```
-
-This endpoint retrieves a specific kitten.
-
-<aside class="warning">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
-
-### HTTP Request
-
-`GET http://example.com/kittens/<ID>`
-
-### URL Parameters
-
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to retrieve
-
-## Delete a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.delete(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.delete(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2"
-  -X DELETE
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.delete(2);
-```
-
-> The above command returns JSON structured like this:
-
-```json
-{
-  "id": 2,
-  "deleted" : ":("
-}
-```
-
-This endpoint retrieves a specific kitten.
-
-### HTTP Request
-
-`DELETE http://example.com/kittens/<ID>`
-
-### URL Parameters
-
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to delete
-
